@@ -11,8 +11,11 @@ from selenium.common.exceptions import *
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-from pyvirtualdisplay import Display
 from selenium import webdriver
+import requests
+import re
+
+import os
 
 # display = Display(visible=0, size=(800, 600))
 # display.start()
@@ -41,14 +44,7 @@ def get_links(driver: WebDriver) -> list[str]:
 
 
 def get_end_link(driver: WebDriver, url: str) -> str:
-    """
-    Open and closes the end link tabs, while retrieving it's url
-    """
-    window_handles: list[str] = driver.window_handles
-
-    assert len(window_handles) == 1
-    driver.execute_script(f'''window.open("{url}","_blank");''')
-    driver.switch_to.window(driver.window_handles[1])
+    driver.get(url)
 
     # Checks for the button to be present
     wait = WebDriverWait(driver, 60, poll_frequency=2,
@@ -62,13 +58,56 @@ def get_end_link(driver: WebDriver, url: str) -> str:
         (By.CSS_SELECTOR, "a > p.showURL")))
     end_link: str = end_link_element.text
 
-    driver.close()
-    driver.switch_to.window(driver.window_handles[0])
-
     return end_link
 
 
+urlRegex = re.compile(
+    r"<p\s*class=\"showURL\"\s*>\s*(.*)\s*</p>")
+
+
+def get_end_link2(url: str) -> str:
+    left, right = url.split('?link=')
+
+    headers = {
+        'authority': 'zt-protect.cam',
+        'content-length': '0',
+        'cache-control': 'max-age=0',
+        'sec-ch-ua': '"Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'upgrade-insecure-requests': '1',
+        'origin': 'https://zt-protect.cam',
+        'content-type': 'application/x-www-form-urlencoded',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'sec-fetch-site': 'same-origin',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-user': '?1',
+        'sec-fetch-dest': 'document',
+        'referer': url,
+        'accept-language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7,es;q=0.6,zh-CN;q=0.5,zh;q=0.4',
+        'cookie': os.getenv('COOKIE'),
+    }
+
+    params = (
+        ('link', right),
+    )
+
+    response = requests.post(left,
+                             headers=headers, params=params)
+    if response.status_code != 200:
+        print("Bad cookie probably")
+        exit(-1)
+
+    whole_page = response.text
+    return urlRegex.findall(whole_page)[-1]
+
+
 if __name__ == '__main__':
+    if not os.getenv('COOKIE'):
+        print("Env needs COOKIE=")
+        exit(1)
+
     ser = Service("./chromedriver.exe")
     op = webdriver.ChromeOptions()
 
@@ -79,20 +118,20 @@ if __name__ == '__main__':
     op.add_argument("--disable-blink-features")
     # op.add_argument("--headless")
     op.add_argument("--disable-dev-shm-usage")
+    op.add_argument('--ignore-certificate-errors')
+    op.add_argument("--incognito")
     op.add_argument("--no-sandbox")
 
     op.add_argument("--log-level=3")
 
     driver = webdriver.Chrome(service=ser, options=op)
-    # driver.set_window_position(-10000, 0)
-
     driver.get(
-        'https://www.zone-telechargement.cam/animes/64804-boku-no-hero-academia-4.html')
+        'https://www.zone-telechargement.cam/telecharger-serie/25512-my-hero-academia-saison-02-vostfr-hd-1080p.html')
 
     page_links = get_links(driver)
     print('\n\n\n\nLiens:')
     for l in page_links:
-        end_link = get_end_link(driver, l)
+        end_link = get_end_link2(l)
         print(end_link)
 
     time.sleep(2)
