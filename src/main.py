@@ -16,12 +16,13 @@ import requests
 import re
 
 import os
+import sys
 
 # display = Display(visible=0, size=(800, 600))
 # display.start()
 
 
-def get_links(driver: WebDriver) -> list[str]:
+def get_links(driver: WebDriver, link_provider="1fichier") -> list[str]:
     sub_nodes: list[WebElement] = driver.find_elements(
         by=By.CSS_SELECTOR, value='.postinfo > b')
 
@@ -30,7 +31,8 @@ def get_links(driver: WebDriver) -> list[str]:
     possible_downloads: list[str] = list(
         map(lambda x: x.text, possible_downloads_elements))
 
-    idx = list(map(lambda x: x.text, sub_nodes)).index('1fichier')
+    idx = list(map(lambda x: x.text.lower(), sub_nodes)
+               ).index(link_provider.lower())
 
     links: list[str] = []
     for link_name in sub_nodes[idx+1:]:
@@ -107,6 +109,10 @@ if __name__ == '__main__':
     if not os.getenv('COOKIE'):
         print("Env needs COOKIE=")
         exit(1)
+    if not sys.argv or len(sys.argv) != 3:
+        print(
+            "Parameters needed, use like so\n\npython3 ./src/main.py '<url>' '<link provider>'")
+        exit(1)
 
     ser = Service("./chromedriver.exe")
     op = webdriver.ChromeOptions()
@@ -126,9 +132,9 @@ if __name__ == '__main__':
 
     driver = webdriver.Chrome(service=ser, options=op)
     driver.get(
-        'https://www.zone-telechargement.cam/telecharger-serie/25512-my-hero-academia-saison-02-vostfr-hd-1080p.html')
+        sys.argv[1])
 
-    page_links = get_links(driver)
+    page_links = get_links(driver, sys.argv[2])
     print('\n\n\n\nLiens:')
     for l in page_links:
         end_link = get_end_link2(l)
