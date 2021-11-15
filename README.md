@@ -6,9 +6,10 @@
 
 ```powershell
 # powershell
-$env:COOKIE = '<snip>'; python3 .\src\main.py
+./Run.ps1 # Will prompt all the needed informations
 ```
 ```bash
+# bash
 COOKIE='<snip>' python3 ./src/main.py
 ```
 
