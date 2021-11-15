@@ -1,5 +1,5 @@
-- [<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/1200px-Flag_of_France.svg.png" height=12 width=20/> Français]()
-- [<img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/ae/Flag_of_the_United_Kingdom.svg/1200px-Flag_of_the_United_Kingdom.svg.png" height=12 width=20/> English]()
+- [<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/1200px-Flag_of_France.svg.png" height=12 width=20/> Français](#-zone-telechargement-extracteur-durl-pour-mangas)
+- [<img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/ae/Flag_of_the_United_Kingdom.svg/1200px-Flag_of_the_United_Kingdom.svg.png" height=12 width=20/> English](#-zone-telechargement-url-extractor)
 
 # <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/1200px-Flag_of_France.svg.png" height=20 width=30/> Zone-telechargement extracteur d'url pour Mangas
 
